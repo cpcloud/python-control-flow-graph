@@ -1,12 +1,8 @@
-class AstBaseTraverser:
+class AstBaseTraverser(object):
     '''The base class for all other traversers.'''
 
-    def __init__(self):
-        pass
-        # A unit test now calls self.check_visitor_names().
-    
     def attribute_base(self,node):
-        
+
         '''Return the node representing the base of the chain.
         Only 'Name' and 'Builtin' nodes represent names.
         All other chains have a base that is a constant or nameless dict, list, etc.
@@ -28,10 +24,10 @@ class AstBaseTraverser:
         return result
 
     def attribute_target(self,node):
-        
+
         '''Return the node representing the target of the chain.
         Only 'Name' and 'Builtin' Ops represent names.'''
-        
+
         trace = True
         kind = self.kind(node)
         if kind in ('Name','Builtin','Str'):
@@ -51,10 +47,10 @@ class AstBaseTraverser:
         return result
     #@+node:ekr.20130315140102.9529: *4* bt.check_visitor_names
     def check_visitor_names(self,silent=False):
-        
+
         '''Check that there is an ast.AST node named x
         for all visitor methods do_x.'''
-        
+
         #@+<< define names >>
         #@+node:ekr.20130315140102.9531: *5* << define names >>
         names = (
@@ -133,7 +129,7 @@ class AstBaseTraverser:
         #     GeneratorExp(expr elt, comprehension* generators)
         #     IfExp(expr test, expr body, expr orelse)
         #     Lambda(arguments args, expr body)
-        #     List(expr* elts, expr_context ctx) 
+        #     List(expr* elts, expr_context ctx)
         #     ListComp(expr elt, comprehension* generators)
         #     Name(identifier id, expr_context ctx)
         #     Num(object n) -- a number as a PyObject.
@@ -154,11 +150,11 @@ class AstBaseTraverser:
         #     Store
         # slice:
         #     Ellipsis
-        #     Slice(expr? lower, expr? upper, expr? step) 
-        #     ExtSlice(slice* dims) 
-        #     Index(expr value) 
+        #     Slice(expr? lower, expr? upper, expr? step)
+        #     ExtSlice(slice* dims)
+        #     Index(expr value)
         # boolop:
-        #     And | Or 
+        #     And | Or
         # operator:
         #     Add | Sub | Mult | Div | Mod | Pow | LShift | RShift | BitOr | BitXor | BitAnd | FloorDiv
         # unaryop:
@@ -167,7 +163,7 @@ class AstBaseTraverser:
         #     Eq | NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
         # excepthandler:
         #     ExceptHandler(expr? type, expr? name, stmt* body)
-        #     
+        #
         # Lower case node names:
         #     alias (identifier name, identifier? asname)
         #     arguments (expr* args, identifier? vararg, identifier? kwarg, expr* defaults)
@@ -178,17 +174,17 @@ class AstBaseTraverser:
         #@+node:ekr.20130320161725.9543: *5* << Py3k grammar >>
         #@@nocolor-node
         #@+at
-        # 
+        #
         #     mod = Module(stmt* body)
         #         | Interactive(stmt* body)
         #         | Expression(expr body)
-        # 
+        #
         #         -- not really an actual node but useful in Jython's typesystem.
         #         | Suite(stmt* body)
-        # 
-        #     stmt = FunctionDef(identifier name, arguments args, 
+        #
+        #     stmt = FunctionDef(identifier name, arguments args,
         #                            stmt* body, expr* decorator_list, expr? returns)
-        #           | ClassDef(identifier name, 
+        #           | ClassDef(identifier name,
         #              expr* bases,
         #              keyword* keywords,
         #              expr? starargs,
@@ -196,33 +192,33 @@ class AstBaseTraverser:
         #              stmt* body,
         #              expr* decorator_list)
         #           | Return(expr? value)
-        # 
+        #
         #           | Delete(expr* targets)
         #           | Assign(expr* targets, expr value)
         #           | AugAssign(expr target, operator op, expr value)
-        # 
+        #
         #           -- use 'orelse' because else is a keyword in target languages
         #           | For(expr target, expr iter, stmt* body, stmt* orelse)
         #           | While(expr test, stmt* body, stmt* orelse)
         #           | If(expr test, stmt* body, stmt* orelse)
         #           | With(withitem* items, stmt* body)
-        # 
+        #
         #           | Raise(expr? exc, expr? cause)
         #           | Try(stmt* body, excepthandler* handlers, stmt* orelse, stmt* finalbody)
         #           | Assert(expr test, expr? msg)
-        # 
+        #
         #           | Import(alias* names)
         #           | ImportFrom(identifier? module, alias* names, int? level)
-        # 
+        #
         #           | Global(identifier* names)
         #           | Nonlocal(identifier* names)
         #           | Expr(expr value)
         #           | Pass | Break | Continue
-        # 
+        #
         #           -- XXX Jython will be different
         #           -- col_offset is the byte offset in the utf8 string the parser uses
         #           attributes (int lineno, int col_offset)
-        # 
+        #
         #           -- BoolOp() can use left & right?
         #     expr = BoolOp(boolop op, expr* values)
         #          | BinOp(expr left, operator op, expr right)
@@ -248,50 +244,50 @@ class AstBaseTraverser:
         #          | Bytes(bytes s)
         #          | Ellipsis
         #          -- other literals? bools?
-        # 
+        #
         #          -- the following expression can appear in assignment context
         #          | Attribute(expr value, identifier attr, expr_context ctx)
         #          | Subscript(expr value, slice slice, expr_context ctx)
         #          | Starred(expr value, expr_context ctx)
         #          | Name(identifier id, expr_context ctx)
-        #          | List(expr* elts, expr_context ctx) 
+        #          | List(expr* elts, expr_context ctx)
         #          | Tuple(expr* elts, expr_context ctx)
-        # 
+        #
         #           -- col_offset is the byte offset in the utf8 string the parser uses
         #           attributes (int lineno, int col_offset)
-        # 
+        #
         #     expr_context = Load | Store | Del | AugLoad | AugStore | Param
-        # 
-        #     slice = Slice(expr? lower, expr? upper, expr? step) 
-        #           | ExtSlice(slice* dims) 
-        #           | Index(expr value) 
-        # 
-        #     boolop = And | Or 
-        # 
-        #     operator = Add | Sub | Mult | Div | Mod | Pow | LShift 
+        #
+        #     slice = Slice(expr? lower, expr? upper, expr? step)
+        #           | ExtSlice(slice* dims)
+        #           | Index(expr value)
+        #
+        #     boolop = And | Or
+        #
+        #     operator = Add | Sub | Mult | Div | Mod | Pow | LShift
         #                  | RShift | BitOr | BitXor | BitAnd | FloorDiv
-        # 
+        #
         #     unaryop = Invert | Not | UAdd | USub
-        # 
+        #
         #     cmpop = Eq | NotEq | Lt | LtE | Gt | GtE | Is | IsNot | In | NotIn
-        # 
+        #
         #     comprehension = (expr target, expr iter, expr* ifs)
-        # 
+        #
         #     excepthandler = ExceptHandler(expr? type, identifier? name, stmt* body)
         #                     attributes (int lineno, int col_offset)
-        # 
+        #
         #     arguments = (arg* args, identifier? vararg, expr? varargannotation,
         #                      arg* kwonlyargs, identifier? kwarg,
         #                      expr? kwargannotation, expr* defaults,
         #                      expr* kw_defaults)
         #     arg = (identifier arg, expr? annotation)
-        # 
+        #
         #     -- keyword arguments supplied to call
         #     keyword = (identifier arg, expr value)
-        # 
+        #
         #     -- import name with optional 'as' alias.
         #     alias = (identifier name, identifier? asname)
-        # 
+        #
         #     withitem = (expr context_expr, expr? optional_vars)
         #@-<< Py3K grammar >>
 
@@ -308,9 +304,9 @@ class AstBaseTraverser:
     def find_function_call (self,node):
         '''
         Return the static name of the function being called.
-        
+
         tree is the tree.func part of the Call node.'''
-        
+
 
         kind = self.kind(node)
         assert kind not in ('str','Builtin')
@@ -334,9 +330,9 @@ class AstBaseTraverser:
 
     def op_name (self,node,strict=True):
         '''Return the print name of an operator node.'''
-        
+
         d = {
-        # Binary operators. 
+        # Binary operators.
         'Add':       '+',
         'BitAnd':    '&',
         'BitOr':     '|',

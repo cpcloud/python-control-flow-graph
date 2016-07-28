@@ -1,48 +1,49 @@
-from src.traversers.astbasetraverser import AstBaseTraverser 
+from astbasetraverser import AstBaseTraverser
 import ast
+
 class AstFullTraverser(AstBaseTraverser):
-    
+
     '''
     A super-fast tree traversal class.
-    
+
     This class defines methods for *all* types of ast.Ast nodes,
     except nodes that typically don't need to be visited, such as nodes
     referenced by node.ctx and node.op fields.
-    
+
     Subclasses are, of course, free to add visitors for, say, ast.Load,
     nodes. To make this work, subclasses must override visitors for
     ast.Node and ast.Attribute nodes so that they call::
-        
+
         self.visit(node.ctx)
-        
+
     At present, such calls are commented out.  Furthermore, if a visitor
     for ast.Load is provided, visitors for *all* kinds of nodes referenced
     by node.ctx fields must also be given.  Such is the price of speed.
     '''
-    
+
     # def __init__(self):
         # AstBaseTraverser.__init__(self)
 
-    def run(self,root):    
+    def run(self,root):
         # py==lint: disable=W0221
             # Arguments number differs from overridden method.
         self.visit(root)
 
-    def do_Bytes(self,node): 
+    def do_Bytes(self,node):
         pass # Python 3.x only.
-        
+
     def do_Ellipsis(self,node):
         pass
-        
+
     def do_Num(self,node):
         pass # Num(object n) # a number as a PyObject.
-        
+
     def do_Str(self,node):
         pass # represents a string constant.
-    
+
     def do_str(self, node):
         pass
-    
+
     def do_Set(self, node):
         pass
 
@@ -51,7 +52,7 @@ class AstFullTraverser(AstBaseTraverser):
             self.visit(z)
         for z in node.defaults:
             self.visit(z)
-            
+
     # Python 3:
     # arg = (identifier arg, expr? annotation)
 
@@ -68,12 +69,12 @@ class AstFullTraverser(AstBaseTraverser):
         # self.op_name(node.op)
         self.visit(node.right)
 
-    def do_BoolOp (self,node): 
+    def do_BoolOp (self,node):
         for z in node.values:
             self.visit(z)
 
     def do_Call(self,node):
-        
+
         self.visit(node.func)
         for z in node.args:
             self.visit(z)
@@ -101,7 +102,7 @@ class AstFullTraverser(AstBaseTraverser):
         for z in node.values:
             self.visit(z)
 
-    def do_Expr(self,node):   
+    def do_Expr(self,node):
         self.visit(node.value)
 
     def do_Expression(self,node):
@@ -122,7 +123,7 @@ class AstFullTraverser(AstBaseTraverser):
         self.visit(node.test)
         self.visit(node.orelse)
 
-    def do_Index (self,node):  
+    def do_Index (self,node):
         self.visit(node.value)
 
     def do_keyword(self,node):
@@ -200,7 +201,7 @@ class AstFullTraverser(AstBaseTraverser):
             self.visit(z)
         for z in node.decorator_list:
             self.visit(z)
-            
+
     def do_Continue(self,tree):
         pass
 
@@ -258,7 +259,7 @@ class AstFullTraverser(AstBaseTraverser):
         pass
 
     def do_Lambda(self,node):
-        
+
         self.visit(node.args)
         self.visit(node.body)
 
@@ -317,7 +318,7 @@ class AstFullTraverser(AstBaseTraverser):
             self.visit(z)
         for z in node.orelse:
             self.visit(z)
-            
+
     def do_With (self,node):
         self.visit(node.context_expr)
         if node.optional_vars:

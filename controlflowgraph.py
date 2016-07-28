@@ -4,10 +4,10 @@ Creates a control flow graph (cfg)
 
 import ast
 from pprint import pprint
-
 from astfulltraverser import AstFullTraverser
 
-class Block():
+
+class Block(object):
     ''' A basic control flow block.
 
     It has one entry point and several possible exit points.
